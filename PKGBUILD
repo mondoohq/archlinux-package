@@ -1,4 +1,6 @@
-# Maintainer Mondoo Inc <hello@mondoo.io>
+# Maintainer: Mondoo Inc <hello@mondoo.io>
+# Maintainer: Dominik Richter <dom@mondoo.io>
+#
 # TODO:
 # - replace the html license with a proper TXT version
 # - use upstream oss-licenses instead of bundling it
