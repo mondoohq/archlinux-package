@@ -1,3 +1,3 @@
-module github.com/mondoolabs/archlinux-package
+module github.com/mondoohq/archlinux-package
 
 go 1.17

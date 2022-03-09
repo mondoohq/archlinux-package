@@ -1,5 +1,5 @@
-# Maintainer: Mondoo Inc <hello@mondoo.io>
-# Maintainer: Dominik Richter <dom@mondoo.io>
+# Maintainer: Mondoo Inc <hello@mondoo.com>
+# Maintainer: Dominik Richter <dom@mondoo.com>
 #
 # TODO:
 # - replace the html license with a proper TXT version
@@ -9,11 +9,11 @@ pkgname=mondoo
 pkgver=5.29.1
 pkgrel=1
 pkgdesc="Infrastructure search, analytics, and security analysis"
-url="https://mondoo.io"
+url="https://mondoo.com"
 license=('custom')
 source=(
-    "https://releases.mondoo.io/mondoo/${pkgver}/mondoo_${pkgver}_linux_amd64.tar.gz"
-    'LICENSE.html::https://mondoo.io/terms'
+    "https://releases.mondoo.com/mondoo/${pkgver}/mondoo_${pkgver}_linux_amd64.tar.gz"
+    'LICENSE.html::https://mondoo.com/terms'
     'OSS-LICENSES.txt'
     'mondoo.service'
     'mondoo.sh'
