@@ -6,7 +6,7 @@
 # - use upstream oss-licenses instead of bundling it
 
 pkgname=mondoo
-pkgver=5.34.1
+pkgver=5.35.0
 pkgrel=1
 pkgdesc="Infrastructure search, analytics, and security analysis"
 url="https://mondoo.com"
@@ -20,7 +20,7 @@ source=(
 )
 arch=('x86_64')
 
-sha256sums=('d91cb7fbb6789b8846539adf6e8747a4a7be3c32a21f67919870437054bf9a02'
+sha256sums=('9d96f1ca0292fec6111651991f4f84abd13faf8986c985b384057246a7f63033'
             '77e73e231a13c3c072e4c8a4812779d34b9bdf9cc6a495f82fd0efc92f07c1aa'
             '8815d47139e8ea19ac407593b91ca232fbfba92bce694b72db159fa53367bb82'
             '2febf46353886823e6a61ca15c73e651d71d45579b0a1a17e18905a61387e7e6'
