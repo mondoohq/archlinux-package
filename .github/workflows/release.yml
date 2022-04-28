@@ -32,7 +32,6 @@ jobs:
       - name: commit
         run: |
           echo '${{ github.event.inputs.version }}'
-          git add Formula/mondoo.rb
-          git add Casks/mondoo-cli.rb
+          git add PKGBUILD
           git commit -m '${{ github.event.inputs.version }}'
           git push origin master
