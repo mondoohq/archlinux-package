@@ -2,7 +2,7 @@
 
 This repository holds the PKGBUILD go generator and the PKGBUILD files from [https://aur.archlinux.org/packages/mondoo/](https://aur.archlinux.org/packages/mondoo/)
 
-## Publish via aurpublish (reminder)
+## Setup aurpublish
 
 ``` bash
 mkdir .git/hooks/
@@ -20,14 +20,18 @@ Host aur aur.archlinux.org
 
 ``` bash
 aurpublish -p mondoo
+```
 
-go run ./generator/main.go > mondoo/PKGBUILD
+## Update aur package
 
-git ap
+``` bash
+make
+```
 
-git cm "<version number"
+``` bash
+git add mondoo/PKGBUILD
+
+git commit -s -m "<version number"
 
 aurpublish mondoo
 ```
-
-Powered by [aurpublish](https://github.com/eli-schwartz/aurpublish)
