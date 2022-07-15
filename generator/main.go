@@ -84,6 +84,7 @@ type PkgBuild struct {
 
 var pkgBuildTemplate = `# Maintainer: Mondoo Inc <hello@mondoo.com>
 # Maintainer: Dominik Richter <dom@mondoo.com>
+# Maintainer: Patrick Münch <patrick@mondoo.com>
 #
 # TODO:
 # - replace the html license with a proper TXT version
@@ -97,17 +98,17 @@ url="https://mondoo.com"
 license=('custom')
 source=(
     "https://releases.mondoo.com/mondoo/${pkgver}/mondoo_${pkgver}_linux_amd64.tar.gz"
-    'LICENSE.html::https://mondoo.com/terms'
-    'OSS-LICENSES.txt'
+    'LICENSE.html'
+    'OSS-LICENSES.tar.xz'
     'mondoo.service'
     'mondoo.sh'
 )
 arch=('x86_64')
 
 sha256sums=('{{ .Sha256 }}'
-            '77e73e231a13c3c072e4c8a4812779d34b9bdf9cc6a495f82fd0efc92f07c1aa'
-            '8815d47139e8ea19ac407593b91ca232fbfba92bce694b72db159fa53367bb82'
-            '2febf46353886823e6a61ca15c73e651d71d45579b0a1a17e18905a61387e7e6'
+            'c8d346670913c91bf712405e57c2311e6fbda37261f8abfadf9ca7e5fdd768bd'
+            'cd99e204a986af5a91f46c43478b28f556a4f50fd9721844d0b600d45ac43cb8'
+	    '2febf46353886823e6a61ca15c73e651d71d45579b0a1a17e18905a61387e7e6'
             '92ceefe40c2963f96d02e36743338599cfa9a062d00a5e38580370099b01066c')
 
 
@@ -119,7 +120,7 @@ package() {
 
   install -Dm 755 mondoo.sh ${pkgdir}/usr/bin/mondoo
   install -Dm 644 LICENSE.html "$pkgdir"/usr/share/licenses/$pkgname/LICENSE.html
-  install -Dm 644 OSS-LICENSES.txt "$pkgdir"/usr/share/licenses/$pkgname/OSS-LICENSES.txt
+  install -Dm 644 OSS-LICENSES.tar.xz "$pkgdir"/usr/share/licenses/$pkgname/OSS-LICENSES.tar.xz
   install -Dm 644 mondoo.service "$pkgdir"/usr/lib/systemd/system/mondoo.service
 }
 
