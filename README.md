@@ -24,8 +24,17 @@ aurpublish -p mondoo
 
 ## Update aur package
 
+- create the PKGBUILD file
+
 ``` bash
 make
+```
+
+- update the .SRCINFO
+
+```bash
+cd mondoo
+makepkg --printsrcinfo > .SRCINFO
 ```
 
 ``` bash
