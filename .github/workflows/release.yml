@@ -20,7 +20,7 @@ jobs:
           go-version: '>=1.17.0'
 
       # runs go to generate the update
-      - run: go run generator/main.go > PKGBUILD
+      - run: make update
 
       # Commit changes
       - name: setup git config

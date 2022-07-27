@@ -1,2 +1,2 @@
 update:
-	go run ./generator/main.go > mondoo/PKGBUILD
+	go run ./generator/main.go ./mondoo
