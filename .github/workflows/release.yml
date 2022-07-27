@@ -32,6 +32,7 @@ jobs:
       - name: commit
         run: |
           echo '${{ github.event.inputs.version }}'
-          git add PKGBUILD
+          git add mondoo/PKGBUILD
+          git add mondoo/.SRCINFO
           git commit -m '${{ github.event.inputs.version }}'
           git push origin master
