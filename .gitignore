@@ -3,3 +3,5 @@ pkg/
 LICENSE.html
 *.tar.gz
 *.tar.zst
+sample-event.json
+.secrets
