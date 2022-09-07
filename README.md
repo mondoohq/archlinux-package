@@ -2,36 +2,29 @@
 
 This repository holds the PKGBUILD go generator and the PKGBUILD files from [https://aur.archlinux.org/packages/mondoo/](https://aur.archlinux.org/packages/mondoo/)
 
-## Setup aurpublish
+## Test github action
 
-``` bash
-mkdir .git/hooks/
-aurpublish setup
+- create the `.secret` file with the following content:
+
+```
+AUR_USERNAME="Patrick Münch"
+AUR_EMAIL="patrick@mondoo.com"
+AUR_SSH_PRIVATE_KEY="-----BEGIN OPENSSH PRIVATE KEY-----\n....\n-----END OPENSSH PRIVATE KEY-----\n"
 ```
 
-- add to /home/user/.ssh/config
+- create the `sample-event.json` file with the following content:
 
-``` text
-Host aur aur.archlinux.org
-        User aur
-        Hostname aur.archlinux.org
-        IdentityFile ~/.ssh/arch-linux-aur
+```
+{
+  "action": "workflow_dispatch",
+  "inputs": {
+      "version": "6.13.1"
+  }
+}
 ```
 
-``` bash
-aurpublish -p mondoo
-```
+- run the following command:
 
-## Update aur package
-
-``` bash
-make
-```
-
-``` bash
-git add mondoo/PKGBUILD
-
-git commit -s -m "<version number"
-
-aurpublish mondoo
+```bash
+act -j aur-publish --secret-file .secrets --eventpath sample-event.json -v
 ```
