@@ -202,10 +202,6 @@ var pkgBuildTemplate = `# Maintainer: Mondoo Inc <hello@mondoo.com>
 # Maintainer: Dominik Richter <dom@mondoo.com>
 # Maintainer: Patrick Münch <patrick@mondoo.com>
 #
-# TODO:
-# - replace the html license with a proper TXT version
-# - use upstream oss-licenses instead of bundling it
-
 pkgname={{ .PkgName }}
 orignalVersion="{{ .Version }}"
 pkgver="${orignalVersion/-/_}"

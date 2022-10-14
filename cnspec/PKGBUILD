@@ -2,10 +2,6 @@
 # Maintainer: Dominik Richter <dom@mondoo.com>
 # Maintainer: Patrick Münch <patrick@mondoo.com>
 #
-# TODO:
-# - replace the html license with a proper TXT version
-# - use upstream oss-licenses instead of bundling it
-
 pkgname=cnspec
 orignalVersion="7.0.0-alpha1"
 pkgver="${orignalVersion/-/_}"
