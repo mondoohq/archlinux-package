@@ -203,13 +203,14 @@ var pkgBuildTemplate = `# Maintainer: Mondoo Inc <hello@mondoo.com>
 # - use upstream oss-licenses instead of bundling it
 
 pkgname={{ .PkgName }}
-pkgver={{ .Version }}
+orignalVersion="{{ .Version }}"
+pkgver="${orignalVersion/-/_}"
 pkgrel=1
 pkgdesc="{{ .Description }}"
 url="https://mondoo.com"
 license=('{{ .License }}')
 source=(
-    "https://releases.mondoo.com/{{ .PkgName }}/${pkgver}/{{ .PkgName }}_${pkgver}_linux_amd64.tar.gz"
+    "https://releases.mondoo.com/{{ .PkgName }}/${orignalVersion}/{{ .PkgName }}_${orignalVersion}_linux_amd64.tar.gz"
     {{ range .ExtraFiles -}}
     '{{ .Name }}'
     {{ end -}}
@@ -224,12 +225,15 @@ sha256sums=('{{ .Sha256 }}'
 
 
 package() {
+  install -dm755 ${pkgdir}/usr/bin
+
   {{- if .IncludeOpt }}
   install -dm755 ${pkgdir}/opt/$pkgname/bin
   cp ${srcdir}/$pkgname ${pkgdir}/opt/$pkgname/bin/.
+  {{- else }}
+  cp ${srcdir}/$pkgname ${pkgdir}/usr/bin/.
   {{- end }}
 
-  install -dm755 ${pkgdir}/usr/bin
   {{ range .ExtraFiles -}}
   install -Dm {{ .Permissions }} {{ .Name }} "$pkgdir"{{- .Destination }}
   {{ end }}

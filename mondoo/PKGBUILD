@@ -7,13 +7,14 @@
 # - use upstream oss-licenses instead of bundling it
 
 pkgname=mondoo
-pkgver=6.19.1
+orignalVersion="6.19.1"
+pkgver="${orignalVersion/-/_}"
 pkgrel=1
 pkgdesc="Mondoo Client CLI for the Mondoo Policy as Code Platform"
 url="https://mondoo.com"
 license=('custom')
 source=(
-    "https://releases.mondoo.com/mondoo/${pkgver}/mondoo_${pkgver}_linux_amd64.tar.gz"
+    "https://releases.mondoo.com/mondoo/${orignalVersion}/mondoo_${orignalVersion}_linux_amd64.tar.gz"
     'LICENSE.html'
     'OSS-LICENSES.tar.xz'
     'mondoo.service'
@@ -30,10 +31,10 @@ sha256sums=('5310611c867a5cc304b461d19490d7836ba044674aef25f09e6ac0cfab045880'
 
 
 package() {
+  install -dm755 ${pkgdir}/usr/bin
   install -dm755 ${pkgdir}/opt/$pkgname/bin
   cp ${srcdir}/$pkgname ${pkgdir}/opt/$pkgname/bin/.
 
-  install -dm755 ${pkgdir}/usr/bin
   install -Dm 644 LICENSE.html "$pkgdir"/usr/share/licenses/$pkgname/LICENSE.html
   install -Dm 644 OSS-LICENSES.tar.xz "$pkgdir"/usr/share/licenses/$pkgname/OSS-LICENSES.tar.xz
   install -Dm 644 mondoo.service "$pkgdir"/usr/lib/systemd/system/mondoo.service
