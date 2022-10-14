@@ -16,11 +16,31 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Publish AUR package
+      - name: Publish mondoo AUR package
         uses: KSXGitHub/github-actions-deploy-aur@v2.5.0
         with:
           pkgname: mondoo
           pkgbuild: ./mondoo/PKGBUILD
+          commit_username: ${{ secrets.AUR_USERNAME }}
+          commit_email: ${{ secrets.AUR_EMAIL }}
+          ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+          commit_message: ${{ github.event.inputs.version }}
+          force_push: 'true'
+      - name: Publish cnquery AUR package
+        uses: KSXGitHub/github-actions-deploy-aur@v2.5.0
+        with:
+          pkgname: cnquery
+          pkgbuild: ./cnquery/PKGBUILD
+          commit_username: ${{ secrets.AUR_USERNAME }}
+          commit_email: ${{ secrets.AUR_EMAIL }}
+          ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+          commit_message: ${{ github.event.inputs.version }}
+          force_push: 'true'
+      - name: Publish cnspec AUR package
+        uses: KSXGitHub/github-actions-deploy-aur@v2.5.0
+        with:
+          pkgname: cnspec
+          pkgbuild: ./cnspec/PKGBUILD
           commit_username: ${{ secrets.AUR_USERNAME }}
           commit_email: ${{ secrets.AUR_EMAIL }}
           ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
