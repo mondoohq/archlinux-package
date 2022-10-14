@@ -1,2 +1,5 @@
-update:
-	go run ./generator/main.go ./mondoo
+update: update-mondoo
+
+update-mondoo:
+	go run ./generator/main.go mondoo ./mondoo
+
