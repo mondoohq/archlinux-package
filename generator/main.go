@@ -2,6 +2,8 @@ package main
 
 import (
 	"bytes"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"io"
 	"log"
@@ -12,26 +14,102 @@ import (
 	"text/template"
 )
 
-const latestUrl = "https://releases.mondoo.com/mondoo/latest.json?ignoreCache=1"
+type SourceFile struct {
+	Name        string
+	Permissions string
+	Destination string
+}
 
-var versionMatcher = regexp.MustCompile(`mondoo\/(\d+.\d+.\d+)\/mondoo`)
+type Product struct {
+	LatestUrl   string
+	Description string
+	Homepage    string
+	PkgName     string
+	Class       string
+	License     string
+	ExtraFiles  []SourceFile
+	IncludeOpt  bool
+	Depends     []string
+}
+
+var products = map[string]Product{
+	"mondoo": {
+		LatestUrl:   "https://releases.mondoo.com/mondoo/latest.json?ignoreCache=1",
+		Description: "Mondoo Client CLI for the Mondoo Policy as Code Platform",
+		Homepage:    "https://mondoo.com",
+		PkgName:     "mondoo",
+		Class:       "Mondoo",
+		License:     "custom",
+		ExtraFiles: []SourceFile{
+			{
+				Name:        "LICENSE.html",
+				Permissions: "644",
+				Destination: "/usr/share/licenses/$pkgname/LICENSE.html",
+			},
+			{
+				Name:        "OSS-LICENSES.tar.xz",
+				Permissions: "644",
+				Destination: "/usr/share/licenses/$pkgname/OSS-LICENSES.tar.xz",
+			},
+			{
+				Name:        "mondoo.service",
+				Permissions: "644",
+				Destination: "/usr/lib/systemd/system/mondoo.service",
+			},
+			{
+				Name:        "mondoo.sh",
+				Permissions: "755",
+				Destination: "/usr/bin/mondoo",
+			},
+		},
+		IncludeOpt: true,
+	},
+	"cnquery": {
+		LatestUrl:   "https://releases.mondoo.com/cnquery/latest.json?ignoreCache=1",
+		Description: "Cloud-Native Query - Asset Inventory Framework",
+		Homepage:    "https://mondoo.com",
+		PkgName:     "cnquery",
+		Class:       "Cnquery",
+		License:     "MPL 2.0",
+	},
+	"cnspec": {
+		LatestUrl:   "https://releases.mondoo.com/cnspec/latest.json?ignoreCache=1",
+		Description: "Cloud-Native Security and Policy Framework ",
+		Homepage:    "https://mondoo.com",
+		PkgName:     "cnspec",
+		Class:       "Cnspec",
+		License:     "MPL 2.0",
+		Depends: []string{
+			"cnquery",
+		},
+	},
+}
 
 // Usage: go run main.go
-// Example: go run generator/main.go /path
+// Example: go run generator/main.go cnquery /path
 func main() {
-	path := "."
-	if len(os.Args) == 2 {
-		path = os.Args[1]
+	if len(os.Args) != 3 {
+		panic("need argument for product and path")
 	}
-	log.Printf("Generating files into %s", path)
 
-	latest, err := fetchLatest()
+	productName := os.Args[1]
+	path := os.Args[2]
+	product, ok := products[productName]
+	if !ok {
+		panic("product not found")
+	}
+
+	latest, err := fetchLatest(product.LatestUrl)
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	versionMatcher := regexp.MustCompile(product.PkgName + `\/(\d+.\d+.\d+(?:[-\d\w]+)?)\/` + product.PkgName)
+
 	// filter by linux and amd64
-	pb := PkgBuild{}
+	pb := PkgBuild{
+		Product: product,
+	}
 
 	for i := range latest.Files {
 		f := latest.Files[i]
@@ -46,9 +124,23 @@ func main() {
 		}
 	}
 
+	for _, sf := range product.ExtraFiles {
+		data, err := os.ReadFile(path + "/" + sf.Name)
+		if err != nil {
+			panic(err)
+		}
+		hashBytes := sha256.Sum256(data)
+		hash := hex.EncodeToString(hashBytes[:])
+		pb.ExtraSha256 = append(pb.ExtraSha256, hash)
+	}
+
 	// write PKGBUILD
 	buf := new(bytes.Buffer)
-	renderPkgBuild(pb, buf)
+	err = renderPkgBuild(pb, buf)
+	if err != nil {
+		panic(err)
+	}
+
 	err = os.WriteFile(path+"/PKGBUILD", buf.Bytes(), 0644)
 	if err != nil {
 		panic(err)
@@ -56,7 +148,11 @@ func main() {
 
 	// write .SRCINFO
 	buf2 := new(bytes.Buffer)
-	renderScrInfo(pb, buf2)
+	err = renderScrInfo(pb, buf2)
+	if err != nil {
+		panic(err)
+	}
+
 	err = os.WriteFile(path+"/.SRCINFO", buf2.Bytes(), 0644)
 	if err != nil {
 		panic(err)
@@ -76,7 +172,7 @@ type File struct {
 	Hash     string `json:"hash"`
 }
 
-func fetchLatest() (*Latest, error) {
+func fetchLatest(latestUrl string) (*Latest, error) {
 	resp, err := http.Get(latestUrl)
 	if err != nil {
 		return nil, err
@@ -96,50 +192,52 @@ func fetchLatest() (*Latest, error) {
 }
 
 type PkgBuild struct {
-	Version string `json:"version"`
-	Sha256  string `json:"sha256"`
+	Product
+	Version     string
+	Sha256      string
+	ExtraSha256 []string
 }
 
 var pkgBuildTemplate = `# Maintainer: Mondoo Inc <hello@mondoo.com>
 # Maintainer: Dominik Richter <dom@mondoo.com>
 # Maintainer: Patrick Münch <patrick@mondoo.com>
 #
-# TODO:
-# - replace the html license with a proper TXT version
-# - use upstream oss-licenses instead of bundling it
-
-pkgname=mondoo
-pkgver={{ .Version }}
+pkgname={{ .PkgName }}
+orignalVersion="{{ .Version }}"
+pkgver="${orignalVersion/-/_}"
 pkgrel=1
-pkgdesc="Infrastructure search, analytics, and security analysis"
+pkgdesc="{{ .Description }}"
 url="https://mondoo.com"
-license=('custom')
+license=('{{ .License }}')
 source=(
-    "https://releases.mondoo.com/mondoo/${pkgver}/mondoo_${pkgver}_linux_amd64.tar.gz"
-    'LICENSE.html'
-    'OSS-LICENSES.tar.xz'
-    'mondoo.service'
-    'mondoo.sh'
+    "https://releases.mondoo.com/{{ .PkgName }}/${orignalVersion}/{{ .PkgName }}_${orignalVersion}_linux_amd64.tar.gz"
+    {{ range .ExtraFiles -}}
+    '{{ .Name }}'
+    {{ end -}}
 )
 arch=('x86_64')
+depends=({{ range .Depends }}'{{ . }}'{{ end }})
 
 sha256sums=('{{ .Sha256 }}'
-            'c8d346670913c91bf712405e57c2311e6fbda37261f8abfadf9ca7e5fdd768bd'
-            'cd99e204a986af5a91f46c43478b28f556a4f50fd9721844d0b600d45ac43cb8'
-	        '2febf46353886823e6a61ca15c73e651d71d45579b0a1a17e18905a61387e7e6'
-            '92ceefe40c2963f96d02e36743338599cfa9a062d00a5e38580370099b01066c')
+            {{ range .ExtraSha256 -}}
+            '{{ . }}'
+            {{ end -}}
+)
 
 
 package() {
-  install -dm755 ${pkgdir}/opt/$pkgname/bin \
-                 ${pkgdir}/usr/bin
+  install -dm755 ${pkgdir}/usr/bin
 
+  {{- if .IncludeOpt }}
+  install -dm755 ${pkgdir}/opt/$pkgname/bin
   cp ${srcdir}/$pkgname ${pkgdir}/opt/$pkgname/bin/.
+  {{- else }}
+  cp ${srcdir}/$pkgname ${pkgdir}/usr/bin/.
+  {{- end }}
 
-  install -Dm 755 mondoo.sh ${pkgdir}/usr/bin/mondoo
-  install -Dm 644 LICENSE.html "$pkgdir"/usr/share/licenses/$pkgname/LICENSE.html
-  install -Dm 644 OSS-LICENSES.tar.xz "$pkgdir"/usr/share/licenses/$pkgname/OSS-LICENSES.tar.xz
-  install -Dm 644 mondoo.service "$pkgdir"/usr/lib/systemd/system/mondoo.service
+  {{ range .ExtraFiles -}}
+  install -Dm {{ .Permissions }} {{ .Name }} "$pkgdir"{{- .Destination }}
+  {{ end }}
 }
 
 #vim: syntax=sh`
@@ -149,25 +247,23 @@ func renderPkgBuild(b PkgBuild, out io.Writer) error {
 	return t.Execute(out, b)
 }
 
-var pkgSourceInfoTemplate = `pkgbase = mondoo
-pkgdesc = Infrastructure search, analytics, and security analysis
+var pkgSourceInfoTemplate = `pkgbase = {{ .PkgName }}
+pkgdesc = {{ .Description }}
 pkgver = {{ .Version }}
 pkgrel = 1
 url = https://mondoo.com
 arch = x86_64
-license = custom
-source = https://releases.mondoo.com/mondoo/{{ .Version }}/mondoo_{{ .Version }}_linux_amd64.tar.gz
-source = LICENSE.html
-source = OSS-LICENSES.tar.xz
-source = mondoo.service
-source = mondoo.sh
+license = {{ .License }}
+source = https://releases.mondoo.com/{{ .PkgName }}/{{ .Version }}/{{ .PkgName }}_{{ .Version }}_linux_amd64.tar.gz
+{{ range .ExtraFiles -}}
+source = {{ .Name }}
+{{ end }}
 sha256sums = {{ .Sha256 }}
-sha256sums = c8d346670913c91bf712405e57c2311e6fbda37261f8abfadf9ca7e5fdd768bd
-sha256sums = cd99e204a986af5a91f46c43478b28f556a4f50fd9721844d0b600d45ac43cb8
-sha256sums = 2febf46353886823e6a61ca15c73e651d71d45579b0a1a17e18905a61387e7e6
-sha256sums = 92ceefe40c2963f96d02e36743338599cfa9a062d00a5e38580370099b01066c
+{{ range .ExtraSha256 -}}
+sha256sums = {{ . }}
+{{ end }}
 
-pkgname = mondoo
+pkgname = {{ .PkgName }}
 `
 
 func renderScrInfo(b PkgBuild, out io.Writer) error {
