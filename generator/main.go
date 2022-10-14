@@ -29,6 +29,7 @@ type Product struct {
 	License     string
 	ExtraFiles  []SourceFile
 	IncludeOpt  bool
+	Depends     []string
 }
 
 var products = map[string]Product{
@@ -78,6 +79,9 @@ var products = map[string]Product{
 		PkgName:     "cnspec",
 		Class:       "Cnspec",
 		License:     "MPL 2.0",
+		Depends: []string{
+			"cnquery",
+		},
 	},
 }
 
@@ -216,6 +220,7 @@ source=(
     {{ end -}}
 )
 arch=('x86_64')
+depends=({{ range .Depends }}'{{ . }}'{{ end }})
 
 sha256sums=('{{ .Sha256 }}'
             {{ range .ExtraSha256 -}}
