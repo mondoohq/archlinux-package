@@ -2,6 +2,24 @@
 
 This repository holds the PKGBUILD go generator and the PKGBUILD files from [https://aur.archlinux.org/packages/mondoo/](https://aur.archlinux.org/packages/mondoo/)
 
+
+## Install cnquery and cnspec
+
+The packages are published on [AUR](https://aur.archlinux.org):
+
+- [cnquery](https://aur.archlinux.org/packages/cnquery)
+- [cnspec](https://aur.archlinux.org/packages/cnspec)
+
+Use one of the [AUR_helpers](https://wiki.archlinux.org/title/AUR_helpers) like `yay` to install the packages:
+
+```
+# install cnquery
+yay -Ss cnquery
+
+# install cnspec
+yay -Ss cnspec
+```
+
 ## Test github action
 
 - create the `.secret` file with the following content:
