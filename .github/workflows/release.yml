@@ -34,5 +34,9 @@ jobs:
           echo '${{ github.event.inputs.version }}'
           git add mondoo/PKGBUILD
           git add mondoo/.SRCINFO
+          git add cnquery/PKGBUILD
+          git add cnquery/.SRCINFO
+          git add cnspec/PKGBUILD
+          git add cnspec/.SRCINFO
           git commit -m '${{ github.event.inputs.version }}'
           git push origin master
