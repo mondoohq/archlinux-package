@@ -1,0 +1,109 @@
+name: Update and Publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "version that should be released"
+        required: true
+        type: string
+  repository_dispatch:
+    types: [update]
+
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest    
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set Version (Workflow Dispatch)
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          echo VERSION=${{ inputs.version }} >> $GITHUB_ENV
+      - name: Set Version (Repository Dispatch)
+        if: github.event_name == 'repository_dispatch'
+        run: |
+          echo VERSION=${{ github.event.client_payload.version }} >> $GITHUB_ENV
+      - name: Unified Version
+        id: version
+        run: |
+          INPUT_NAME=${{ inputs.name }}
+          if [[ ${INPUT_NAME} == '' ]]; then
+            echo "Name is empty, using default"
+            echo "name=mondoo" >> $GITHUB_OUTPUT
+          else
+            echo "Name: ${INPUT_NAME}"
+            echo "name=${INPUT_NAME}" >> $GITHUB_OUTPUT
+          fi
+          echo "Version: $VERSION"
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+
+
+  release:
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: 'master'
+          fetch-depth: 0
+      - name: Setup Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: '>=1.17.0'
+      - name: Execute generator (make update)
+        run: make update
+      - name: Commit new version
+        run: |
+          echo "${{ needs.setup.outputs.version }}" > VERSION
+          git config --global user.email "tools@mondoo.com"
+          git config --global user.name "Mondoo Tools"
+          git add mondoo/PKGBUILD
+          git add mondoo/.SRCINFO
+          git add cnquery/PKGBUILD
+          git add cnquery/.SRCINFO
+          git add cnspec/PKGBUILD
+          git add cnspec/.SRCINFO
+          git commit -m "${{ needs.setup.outputs.version }}""
+          git push origin master
+
+  aur-publish:
+    needs: [setup, release]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Publish mondoo AUR package
+        uses: KSXGitHub/github-actions-deploy-aur@v2.5.0
+        with:
+          pkgname: mondoo
+          pkgbuild: ./mondoo/PKGBUILD
+          commit_username: ${{ secrets.AUR_USERNAME }}
+          commit_email: ${{ secrets.AUR_EMAIL }}
+          ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+          commit_message: ${{ needs.setup.outputs.version }}
+          force_push: 'true'
+      - name: Publish cnquery AUR package
+        uses: KSXGitHub/github-actions-deploy-aur@v2.5.0
+        with:
+          pkgname: cnquery
+          pkgbuild: ./cnquery/PKGBUILD
+          commit_username: ${{ secrets.AUR_USERNAME }}
+          commit_email: ${{ secrets.AUR_EMAIL }}
+          ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+          commit_message: ${{ needs.setup.outputs.version }}
+          force_push: 'true'
+      - name: Publish cnspec AUR package
+        uses: KSXGitHub/github-actions-deploy-aur@v2.5.0
+        with:
+          pkgname: cnspec
+          pkgbuild: ./cnspec/PKGBUILD
+          commit_username: ${{ secrets.AUR_USERNAME }}
+          commit_email: ${{ secrets.AUR_EMAIL }}
+          ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+          commit_message: ${{ needs.setup.outputs.version }}
+          force_push: 'true'
