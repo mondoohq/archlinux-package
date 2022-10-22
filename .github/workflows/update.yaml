@@ -69,7 +69,7 @@ jobs:
           git add cnquery/.SRCINFO
           git add cnspec/PKGBUILD
           git add cnspec/.SRCINFO
-          git commit -m "${{ needs.setup.outputs.version }}""
+          git commit -m "${{ needs.setup.outputs.version }}"
           git push origin master
 
   aur-publish:
