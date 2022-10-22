@@ -58,9 +58,15 @@ jobs:
           go-version: '>=1.17.0'
       - name: Execute generator (make update)
         run: make update
+      - name: Ensure version is new
+	run: |
+          if [[ `git status --short | wc -l` == 0 ]]; then 
+            echo "Nothing change... exiting."; 
+            exit 1
+          fi
       - name: Commit new version
         run: |
-          echo "${{ needs.setup.outputs.version }}" > VERSION
+          echo "${{ needs.setup.outputs.version }}"
           git config --global user.email "tools@mondoo.com"
           git config --global user.name "Mondoo Tools"
           git add mondoo/PKGBUILD
