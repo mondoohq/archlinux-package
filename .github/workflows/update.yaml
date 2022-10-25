@@ -1,4 +1,4 @@
-name: "Automated Update"
+name: Automated Update
 
 on:
   workflow_dispatch:
@@ -59,7 +59,7 @@ jobs:
         run: make update
       - name: Ensure version is ne
       	run: |
-	  if [[ `git status --short | wc -l` == 0 ]]; then 
+          if [[ `git status --short | wc -l` == 0 ]]; then 
             echo "Nothing change... exiting."; 
             exit 1
           fi
