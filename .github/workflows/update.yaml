@@ -58,7 +58,7 @@ jobs:
       - name: Execute generator (make update)
         run: make update
       - name: Ensure version is new
-	run: |
+	      run: |
           if [[ `git status --short | wc -l` == 0 ]]; then 
             echo "Nothing change... exiting."; 
             exit 1
