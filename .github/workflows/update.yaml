@@ -1,4 +1,4 @@
-name: "Update and Publish"
+name: "Automated Update"
 
 on:
   workflow_dispatch:
@@ -19,7 +19,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-
       - name: Set Version (Workflow Dispatch)
         if: github.event_name == 'workflow_dispatch'
         run: |
