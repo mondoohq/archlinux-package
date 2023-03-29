@@ -1,16 +1,32 @@
 # Arch Linux AUR PKGBUILD for Mondoo
 
-This repository holds the PKGBUILD go generator and the PKGBUILD files from [https://aur.archlinux.org/packages/mondoo/](https://aur.archlinux.org/packages/mondoo/)
+This repository holds the PKGBUILD generator and the PKGBUILD files from [https://aur.archlinux.org/packages/mondoo/](https://aur.archlinux.org/packages/mondoo/)
 
 
-## Install cnquery and cnspec
+## Install cnquery & cnspec
 
 The packages are published on [AUR](https://aur.archlinux.org):
 
 - [cnquery](https://aur.archlinux.org/packages/cnquery)
 - [cnspec](https://aur.archlinux.org/packages/cnspec)
 
-Use one of the [AUR_helpers](https://wiki.archlinux.org/title/AUR_helpers) like `yay` to install the packages:
+### Installation with MakePKG
+
+```bash
+# Install cnquery
+git clone https://aur.archlinux.org/cnquery 
+ cd cnquery 
+ makepkg -si
+ 
+# Install cnsepc (requires cnquery to be installed)
+git clone https://aur.archlinux.org/cnspec 
+ cd cnspec
+ makepkg -si
+```
+
+### Installation with Yay
+
+We highly recommend using one of the [AUR_helpers](https://wiki.archlinux.org/title/AUR_helpers) like [`yay`](https://github.com/Jguer/yay/) to install the packages.  Note that cnquery is a dependancy of cnspec, so Yay will automatically install it for you.
 
 ```
 # install cnquery
@@ -20,7 +36,7 @@ yay -Ss cnquery
 yay -Ss cnspec
 ```
 
-## Test github action
+# Test github action
 
 - create the `.secret` file with the following content:
 
