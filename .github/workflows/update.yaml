@@ -61,6 +61,11 @@ jobs:
       - name: Execute generator (make update)
         run: |
           make update
+      - name: 'DEBUG: Show generated package versions'
+        run: |
+          echo "mondoo: $(cat mondoo/PKGBUILD | grep orignalVersion=)"
+          echo "cnquery: $(cat cnquery/PKGBUILD | grep orignalVersion=)"
+          echo "cnspec: $(cat cnspec/PKGBUILD | grep orignalVersion=)"
       - name: Ensure version is new
         run: |
           if [[ `git status --short | wc -l` == 0 ]]; then 
