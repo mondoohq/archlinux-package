@@ -1,11 +1,12 @@
-name: Automated Update
+name: 'AUR Release Update (Automated)'
 
 on:
   workflow_dispatch:
     inputs:
       version:
-        description: "version that should be released"
+        description: "Version to release"
         required: true
+        default: "8.0.0"
         type: string
   repository_dispatch:
     types: [update]
@@ -14,6 +15,7 @@ on:
 jobs:
   setup:
     runs-on: ubuntu-latest    
+    name: 'Unify Inputs'
     outputs:
       version: ${{ steps.version.outputs.version }}
     steps:
@@ -42,8 +44,9 @@ jobs:
           echo "version=${VERSION}" >> $GITHUB_OUTPUT
 
 
-  release:
+  update-pkgs:
     runs-on: ubuntu-latest
+    name: 'Generate & Locally Commit PKGBUILDs'
     needs: setup
     steps:
       - name: Checkout
@@ -58,6 +61,11 @@ jobs:
       - name: Execute generator (make update)
         run: |
           make update
+      - name: 'DEBUG: Show generated package versions'
+        run: |
+          echo "mondoo: $(cat mondoo/PKGBUILD | grep orignalVersion=)"
+          echo "cnquery: $(cat cnquery/PKGBUILD | grep orignalVersion=)"
+          echo "cnspec: $(cat cnspec/PKGBUILD | grep orignalVersion=)"
       - name: Ensure version is new
         run: |
           if [[ `git status --short | wc -l` == 0 ]]; then 
@@ -79,7 +87,8 @@ jobs:
           git push origin master
 
   aur-publish:
-    needs: [setup, release]
+    name: "Publish packages to Arch User Repository (AUR)"
+    needs: [setup, update-pkgs]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

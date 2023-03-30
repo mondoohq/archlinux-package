@@ -1,4 +1,4 @@
-name: Publish Release
+name: 'MANUAL: Publish Release to AUR'
 
 on:
   workflow_dispatch:
