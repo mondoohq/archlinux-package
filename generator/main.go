@@ -63,6 +63,9 @@ var products = map[string]Product{
 			},
 		},
 		IncludeOpt: true,
+		Depends: []string{
+			"cnspec",
+		},
 	},
 	"cnquery": {
 		LatestUrl:   "https://releases.mondoo.com/cnquery/latest.json?ignoreCache=1",
