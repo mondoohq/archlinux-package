@@ -1,3 +1,6 @@
+// Copyright (c) Mondoo, Inc.
+// SPDX-License-Identifier: BUSL-1.1
+
 package main
 
 import (
@@ -73,7 +76,7 @@ var products = map[string]Product{
 		Homepage:    "https://mondoo.com",
 		PkgName:     "cnquery",
 		Class:       "Cnquery",
-		License:     "MPL 2.0",
+		License:     "BUSL-1.1",
 	},
 	"cnspec": {
 		LatestUrl:   "https://releases.mondoo.com/cnspec/latest.json?ignoreCache=1",
@@ -81,7 +84,7 @@ var products = map[string]Product{
 		Homepage:    "https://mondoo.com",
 		PkgName:     "cnspec",
 		Class:       "Cnspec",
-		License:     "MPL 2.0",
+		License:     "BUSL-1.1",
 		Depends: []string{
 			"cnquery",
 		},
